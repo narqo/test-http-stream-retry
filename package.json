@@ -1,0 +1,24 @@
+{
+  "name": "test-http-stream",
+  "version": "0.0.1",
+  "description": "Test http streaming request with retries",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Vladimir Varankin <nek.narqo@gmail.com> (http://github.com/narqo)",
+  "license": "WTFPL",
+  "dependencies": {
+    "concat-stream": "^1.5.1",
+    "contimer": "^1.0.1",
+    "duplexify": "^3.4.2",
+    "object-assign": "^4.0.1",
+    "pump": "^1.0.0",
+    "retry": "^0.8.0",
+    "through2": "^2.0.0",
+    "unzip-response": "^1.0.0"
+  },
+  "devDependencies": {
+    "mitm": "^1.2.0"
+  }
+}
