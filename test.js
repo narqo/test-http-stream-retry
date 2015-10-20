@@ -1,27 +1,40 @@
 var url = require('url');
 var mitm = require('mitm');
-var Request = require('./index');
+var ask = require('./index');
 
 const urlToAsk = 'http://yandex.net';
-
-function ask(opts) {
-    return new Request(opts).execute();
-}
 
 var server = mitm();
 
 var attempt = 0;
-var maxAttempts = 2;
 
 server.on('request', function(req, res) {
-    if (attempt++ < maxAttempts) {
+    ++attempt;
+
+    if (attempt < 2) {
         res.statusCode = 501;
-        res.end('service is not available');
+        return res.end('service is not available');
     }
-    res.end('here\'s your response!\n');
+
+    res.end('deal with it\n');
 });
 
-ask({
-    url: urlToAsk,
-    maxRetries: 2
-}).pipe(process.stdout);
+function test(prefix, fn) {
+    process.nextTick(function() {
+        console.error(prefix);
+        fn();
+    });
+}
+
+//test('1. test streaming', function() {
+//    ask({
+//        url: urlToAsk
+//    }).pipe(process.stdout);
+//});
+
+test('2. test streaming with retries', function() {
+    ask({
+        url: urlToAsk,
+        maxRetries: 1
+    }).pipe(process.stdout);
+});

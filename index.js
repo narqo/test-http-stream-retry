@@ -8,9 +8,7 @@ var retry = require('retry');
 var unzipResponse = require('unzip-response');
 var concat = require('concat-stream');
 
-const debug = require('util').debuglog('test-http-stream');
-
-module.exports = Request;
+const debug = require('util').debuglog('askertest');
 
 const HTTP_PROTO_RE = /^https?:\/\//ig;
 
@@ -47,7 +45,14 @@ function Request(opts_, cb) {
         minTimeout: this.options.minRetriesTimeout,
         maxTimeout: this.options.maxRetriesTimeout
     });
+
     this._executionTimer = null;
+
+    if (typeof cb === 'function') {
+        this._callback = cb;
+    } else {
+        this._callback = null;
+    }
 }
 
 Request.prototype._checkNetworkError = function(statusCode) {
@@ -134,9 +139,24 @@ Request.prototype.execute = function() {
         self._tryHttpRequest(stream, opts);
     });
 
+    if (self._callback) {
+        stream.once('responce', function(res) {
+            self._callback.call(self, null, res)
+        });
+        stream.once('error', function(err) {
+            self._callback.call(self, err);
+        });
+    }
+
     return stream;
 };
 
 function buildTimerId(id) {
     return id;
 }
+
+exports = module.exports = function(opts, cb) {
+    return new Request(opts, cb).execute();
+};
+
+exports.Request = Request;
